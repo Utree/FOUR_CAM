@@ -33,7 +33,7 @@ interval = 3
 # 保存場所
 storage = "/home/pi/Desktop/4cam_img/"
 # 指示機のIPアドレス
-IP = "192.168.1.69"
+IP = "192.168.1.251"
 # 指示機のポート番号
 PORT = "8080"
 
@@ -219,17 +219,18 @@ class ListenWebsocket(QtCore.QThread):
         self.WS.run_forever()
 
     def on_message(self, ws, message):
-        global ui_label_img_list
+        global take_photo_flag, previous_time
 
         print("### message received ###")
         print(message)
 
-        # create timestamp
-        dt = datetime.datetime.now()
-        # take photo
-        for i in range(len(ui_label_img_list)):
-            ui_label_img_list[i].pixmap().save(
-                storage + str(dt) + "_" + str(i) + ".png")
+        # 現在時刻
+        previous_time = datetime.datetime.now()
+
+        if take_photo_flag:
+            take_photo_flag = False
+        else:
+            take_photo_flag = True
 
     def on_error(self, ws, error):
         print(error)
