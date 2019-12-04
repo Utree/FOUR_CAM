@@ -29,7 +29,7 @@ exposure_time_absolute = 1000  # min = 1  max=10000  step=1
 撮影方法のパラメータ
 '''
 # 秒間のインターバル
-interval = 3
+interval = 6
 # 保存場所
 storage = "/home/pi/Desktop/4cam_img/"
 # 指示機のIPアドレス
@@ -273,7 +273,7 @@ class CamGui(QtWidgets.QMainWindow):
         撮影開始のトリガはメインウィンドウ左上の画像押下。
         画像の名前は[タイムスタンプ_カメラID.png]。
         """
-        global previous_time, ui_label_img_list
+        global previous_time, ui_label_img_list, interval
 
         ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
 
