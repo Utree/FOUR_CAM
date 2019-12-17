@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton
 from PyQt5 import QtCore
 import websocket
+from PyQt5.QtCore import QTimer
 
 
 class MyWindow(QMainWindow):
@@ -43,14 +44,14 @@ class ListenWebsocket(QtCore.QThread):
     def run(self):
         self.WS.run_forever(http_proxy_host="")
 
-    def on_message(ws, message):
+    def on_message(self, ws, message):
         print("### message received ###")
         print(message)
 
-    def on_error(ws, error):
+    def on_error(self, ws, error):
         print(error)
 
-    def on_close(ws):
+    def on_close(self, ws):
         print("### closed ###")
         print(ws)
 

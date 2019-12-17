@@ -16,6 +16,9 @@ def client_left(client, server):
         client['address'][0], client['address'][1]))
 
     CLIENTS.remove(client)
+    # 接続台数が少ない場合音を鳴らす
+    while len(CLIENTS) < 5:
+        print("\007", end="")
 
 
 def message_received(client, server, message):
