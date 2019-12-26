@@ -23,8 +23,14 @@ brightness = 50               # min=0   max=100  step=1
 contrast = 0                  # min=-100  max=100  step=1
 saturation = 0                # min=-100  max=100  step=1
 rotate = 0                    # min=0  max=360  step=90
-auto_exposure = 0             # min=0  max=3
-exposure_time_absolute = 1000  # min = 1  max=10000  step=1
+auto_exposure = 1             # exposure: manual
+exposure_time_absolute = 60   # shutter time
+auto_exposure_bias = 12       # exposure fix
+white_balance_auto_preset = 0 # auto white balance setting
+red_balance = 1500            # red balance vs green
+blue_balance = 1000           # blue balance vs green
+iso_sensitivity_auto = 0      # manual
+iso_sensitivity = 1           # iso 100
 '''
 撮影方法のパラメータ
 '''
@@ -33,7 +39,7 @@ interval = 6
 # 保存場所
 storage = "/home/pi/Desktop/4cam_img/"
 # 指示機のIPアドレス
-IP = "192.168.1.251"
+IP = "192.168.1.110"
 # 指示機のポート番号
 PORT = "8080"
 
@@ -83,10 +89,12 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d" % (auto_exposure)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c exposure_time_absolute=%d" % (
-            exposure_time_absolute)
+        command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
+            white_balance_auto_preset,red_balance,blue_balance)
+        _ = subprocess.call(command, shell=True)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         rev, frame = cap.read()
         time.sleep(1)
@@ -106,10 +114,12 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d" % (auto_exposure)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c exposure_time_absolute=%d" % (
-            exposure_time_absolute)
+        command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
+            white_balance_auto_preset,red_balance,blue_balance)
+        _ = subprocess.call(command, shell=True)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         rev, frame = cap.read()
         time.sleep(1)
@@ -129,10 +139,12 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d" % (auto_exposure)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c exposure_time_absolute=%d" % (
-            exposure_time_absolute)
+        command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
+            white_balance_auto_preset,red_balance,blue_balance)
+        _ = subprocess.call(command, shell=True)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         rev, frame = cap.read()
 
@@ -154,10 +166,12 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d" % (auto_exposure)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c exposure_time_absolute=%d" % (
-            exposure_time_absolute)
+        command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
+            white_balance_auto_preset,red_balance,blue_balance)
+        _ = subprocess.call(command, shell=True)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         time.sleep(1)
 
