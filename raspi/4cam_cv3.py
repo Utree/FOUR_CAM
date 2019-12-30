@@ -294,7 +294,7 @@ class CamGui(QtWidgets.QMainWindow):
         # 現在時刻を取得
         dt = datetime.datetime.now()
 
-        if take_photo_flag and (dt-previous_time).seconds > interval:
+        if take_photo_flag and (dt-previous_time).seconds >= interval:
             # 画像を保存
             for i in range(len(ui_label_img_list)):
                 ui_label_img_list[i].pixmap().save(
