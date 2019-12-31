@@ -1,16 +1,13 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel
 from PyQt5 import QtCore
 import websocket
-from PyQt5.QtCore import QTimer
 
 
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = 'メインウィンドウ'
-        self.width = 150
-        self.height = 150
         self.initUI()
         self.thread = ListenWebsocket()
         self.thread.start()
@@ -18,16 +15,50 @@ class MyWindow(QMainWindow):
     def initUI(self):
         self.setWindowTitle(self.title)
 
-        btn1 = QPushButton("撮影", self)
-        btn1.move(30, 50)
-        # クリックされたらbuttonClickedの呼び出し
-        btn1.clicked.connect(self.buttonClicked)
+        self.lbl1 = QLabel('音が鳴る時、すべての撮影が停止しています', self)
+        self.lbl1.move(10, 0)
+        self.lbl1.resize(350, 20)
+        self.lbl2 = QLabel('全ラズパイのアプリケーションを再起動して下さい', self)
+        self.lbl2.move(10, 20)
+        self.lbl2.resize(350, 20)
+
+        self.btn1 = QPushButton("撮影開始", self)
+        self.btn1.setStyleSheet("background-color: #2190ff")
+        self.btn1.move(30, 50)
+        self.btn1.clicked.connect(self.startBtn)
+
+        self.btn2 = QPushButton("撮影停止", self)
+        self.btn2.setStyleSheet("background-color: #ff8121")
+        self.btn2.move(200, 50)
+        self.btn2.clicked.connect(self.stopBtn)
+
+        self.btn3 = QPushButton("ラベル変更", self)
+        self.btn3.setStyleSheet("background-color: #58d411")
+        self.btn3.move(200, 100)
+        self.btn3.clicked.connect(self.labelBtn)
+
+        self.tb1 = QLineEdit(self)
+        self.tb1.move(30, 110)
+        self.tb1.resize(140, 20)
+
+        self.btn4 = QPushButton("状態確認", self)
+        self.btn4.setStyleSheet("background-color: #ffffff")
+        self.btn4.move(30, 200)
+        self.btn4.clicked.connect(self.checkBtn)
 
         self.show()
 
-    def buttonClicked(self):
-        # ステータスバーへメッセージの表示
-        self.thread.WS.send("Hello")
+    def startBtn(self):
+        self.thread.WS.send("start")
+
+    def stopBtn(self):
+        self.thread.WS.send("stop")
+
+    def labelBtn(self):
+        self.thread.WS.send(self.tb1.text())
+
+    def checkBtn(self):
+        self.thread.WS.send("status")
 
 
 class ListenWebsocket(QtCore.QThread):
@@ -44,21 +75,23 @@ class ListenWebsocket(QtCore.QThread):
     def run(self):
         self.WS.run_forever(http_proxy_host="")
 
-    def on_message(self, ws, message):
+    def on_message(self, message):
         print("### message received ###")
         print(message)
 
-    def on_error(self, ws, error):
+    def on_error(self, error):
         print(error)
 
-    def on_close(self, ws):
+    def on_close(self):
         print("### closed ###")
-        print(ws)
 
 
 def main():
+    width = 350
+    height = 250
     app = QApplication(sys.argv)
-    _ = MyWindow()
+    win = MyWindow()
+    win.resize(width, height)
     sys.exit(app.exec_())
 
 

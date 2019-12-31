@@ -17,6 +17,8 @@ def client_left(client, server):
 
     CLIENTS.remove(client)
     # 接続台数が少ない場合音を鳴らす
+    for c in CLIENTS:
+        server.send_message(c, "stop")
     while len(CLIENTS) < 5:
         print("\007", end="")
 
@@ -24,12 +26,22 @@ def client_left(client, server):
 def message_received(client, server, message):
     print('Message "{}" has been received from {}:{}'.format(
         message, client['address'][0], client['address'][1]))
-    reply_message = 'Hi! ' + message
-    # メッセージが届いたらすべての接続先に対してテキストを送る
-    for c in CLIENTS:
-        server.send_message(c, reply_message)
-        print('Message "{}" has been sent to {}:{}'.format(
-            reply_message, c['address'][0], c['address'][1]))
+    reply_message = message
+
+    # raspiからの応答をcontrollerに返す
+    if message[:4] == "flag":
+        for c in CLIENTS:
+            if c['address'][0] == "127.0.0.1":
+                server.send_message(c, reply_message)
+                print('Message "{}" has been sent to {}:{}'.format(
+                    reply_message, c['address'][0], c['address'][1]))
+    # controllerからの応答をraspiに返す
+    else:
+        for c in CLIENTS:
+            if c != client:
+                server.send_message(c, reply_message)
+                print('Message "{}" has been sent to {}:{}'.format(
+                    reply_message, c['address'][0], c['address'][1]))
 
 
 # Main
