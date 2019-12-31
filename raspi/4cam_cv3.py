@@ -19,9 +19,10 @@ import websocket
 '''
 camera resolution
 https://www.arducam.com/product/b003301-arducam-5mp-ov5647-1080p-noir-camera-for-raspberry-pi-infrared-camera-module-sensitive-to-ir-light/
+https://stackoverflow.com/questions/19448078/python-opencv-access-webcam-maximum-resolution/20120262
 '''
-width = 2592  # 320
-height = 1944  # 240
+width = 480  # 320
+height = 640  # 240
 fps = 30
 brightness = 50               # min=0   max=100  step=1
 contrast = 0                  # min=-100  max=100  step=1
@@ -39,12 +40,12 @@ iso_sensitivity = 1           # iso 100
 撮影方法のパラメータ
 '''
 # インターバル (n秒)
-interval_time = 6
+INTERVAL_TIME = 6
+# 休憩時間 (n秒)
+REST_TIME = 10
 # 撮影回数 (n回)
 SHOTS = 12
 shot_counter = 0
-# 休憩時間 (n秒)
-rest_time = 10
 # ラベル
 label = "undefined"
 # 保存場所
@@ -310,12 +311,12 @@ class CamGui(QtWidgets.QMainWindow):
     def update_photo(self, index, qimg):
         """定周期で撮影する用の関数
 
-        グローバル変数のinterval_time(秒)間隔で表示されている画像をpngファイルとして
+        グローバル変数のINTERVAL_TIME(秒)間隔で表示されている画像をpngファイルとして
         保存する関数。
         撮影開始のトリガはメインウィンドウ左上の画像押下。
         画像の名前は[タイムスタンプ_カメラID_angelID_label.png]。
         """
-        global ui_label_img_list, interval_time, shot_counter, SHOTS, label, PATH, next_shot_time
+        global ui_label_img_list, INTERVAL_TIME, REST_TIME, shot_counter, SHOTS, label, PATH, next_shot_time
 
         ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
 
@@ -335,9 +336,9 @@ class CamGui(QtWidgets.QMainWindow):
                 shot_counter = (shot_counter+1) % SHOTS
                 # 時間を更新
                 if shot_counter != 0:
-                    next_shot_time = next_shot_time + datetime.timedelta(seconds=6)
+                    next_shot_time = next_shot_time + datetime.timedelta(seconds=INTERVAL_TIME)
                 else:
-                    next_shot_time = next_shot_time + datetime.timedelta(seconds=10)
+                    next_shot_time = next_shot_time + datetime.timedelta(seconds=REST_TIME)
 
     def on_mouse_release_label_img(self, ev):
         """メインウィンドウの押下処理
