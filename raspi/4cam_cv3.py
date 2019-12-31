@@ -16,8 +16,12 @@ import websocket
 '''
 画像のパラメータ
 '''
-width = 240  # 320
-height = 320  # 240
+'''
+camera resolution
+https://www.arducam.com/product/b003301-arducam-5mp-ov5647-1080p-noir-camera-for-raspberry-pi-infrared-camera-module-sensitive-to-ir-light/
+'''
+width = 2592  # 320
+height = 1944  # 240
 fps = 30
 brightness = 50               # min=0   max=100  step=1
 contrast = 0                  # min=-100  max=100  step=1
@@ -26,7 +30,7 @@ rotate = 0                    # min=0  max=360  step=90
 auto_exposure = 1             # exposure: manual
 exposure_time_absolute = 60   # shutter time
 auto_exposure_bias = 12       # exposure fix
-white_balance_auto_preset = 0 # auto white balance setting
+white_balance_auto_preset = 0  # auto white balance setting
 red_balance = 1500            # red balance vs green
 blue_balance = 1000           # blue balance vs green
 iso_sensitivity_auto = 0      # manual
@@ -34,10 +38,18 @@ iso_sensitivity = 1           # iso 100
 '''
 撮影方法のパラメータ
 '''
-# 秒間のインターバル
-interval = 6
+# インターバル (n秒)
+interval_time = 6
+# 撮影回数 (n回)
+SHOTS = 12
+shot_counter = 0
+# 休憩時間 (n秒)
+rest_time = 10
+# ラベル
+label = "undefined"
 # 保存場所
 storage = "/home/pi/Desktop/4cam_img/"
+PATH = storage
 # 指示機のIPアドレス
 IP = "192.168.1.110"
 # 指示機のポート番号
@@ -46,8 +58,8 @@ PORT = "8080"
 '''
 その他の変数
 '''
-# 現在時刻
-previous_time = datetime.datetime.now()
+# 次の撮影時間
+next_shot_time = datetime.datetime.now()
 # 撮影中フラグ
 take_photo_flag = False
 # 画面に表示中の画像
@@ -233,18 +245,34 @@ class ListenWebsocket(QtCore.QThread):
         self.WS.run_forever()
 
     def on_message(self, ws, message):
-        global take_photo_flag, previous_time
+        global take_photo_flag, label, PATH, storage, next_shot_time
 
         print("### message received ###")
         print(message)
 
-        # 現在時刻
-        previous_time = datetime.datetime.now()
-
-        if take_photo_flag:
-            take_photo_flag = False
-        else:
+        # messageがstartのとき撮影開始
+        if message == "start":
             take_photo_flag = True
+            # ディレクトリをつくる
+            now = datetime.datetime.now()
+            os.makedirs(
+                storage + "/" +
+                now.strftime("%Y-%m-%d_%H:%M:%S")
+            )
+            PATH = storage + "/" + now.strftime("%Y-%m-%d_%H:%M:%S") + "/"
+            next_shot_time = now
+        # messageがstopのとき撮影停止
+        elif message == "stop":
+            take_photo_flag = False
+        # messageがstatusのとき現在の情報を提示
+        elif message == "status":
+            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH
+            + ",nextshot: " + next_shot_time.strftime("%Y-%m-%d_%H:%M:%S")
+            + ",prevangle: " + str(shot_counter) + ",label: " + label
+            ws.send(status)
+        # messageがその他のときラベル更新
+        else:
+            label = message
 
     def on_error(self, ws, error):
         print(error)
@@ -282,25 +310,34 @@ class CamGui(QtWidgets.QMainWindow):
     def update_photo(self, index, qimg):
         """定周期で撮影する用の関数
 
-        グローバル変数のinterval(秒)間隔で表示されている画像をpngファイルとして
+        グローバル変数のinterval_time(秒)間隔で表示されている画像をpngファイルとして
         保存する関数。
         撮影開始のトリガはメインウィンドウ左上の画像押下。
-        画像の名前は[タイムスタンプ_カメラID.png]。
+        画像の名前は[タイムスタンプ_カメラID_angelID_label.png]。
         """
-        global previous_time, ui_label_img_list, interval
+        global ui_label_img_list, interval_time, shot_counter, SHOTS, label, PATH, next_shot_time
 
         ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
 
         # 現在時刻を取得
-        dt = datetime.datetime.now()
-
-        if take_photo_flag and (dt-previous_time).seconds >= interval:
-            # 画像を保存
-            for i in range(len(ui_label_img_list)):
-                ui_label_img_list[i].pixmap().save(
-                    storage + str(dt) + "_" + str(i) + ".png")
-            # 時間を更新
-            previous_time = dt
+        now = datetime.datetime.now()
+        if take_photo_flag:
+            # 予定された撮影時間より過ぎていたとき
+            if next_shot_time <= now:
+                # 画像を保存
+                for i in range(len(ui_label_img_list)):
+                    ui_label_img_list[i].pixmap().save(
+                        PATH + now.strftime("%Y-%m-%d_%H:%M:%S") +
+                        "_cam" + str(i) +
+                        "_angle" + str(shot_counter) +
+                        "_" + label + ".png")
+                # shot_counterを更新
+                shot_counter = (shot_counter+1) % SHOTS
+                # 時間を更新
+                if shot_counter != 0:
+                    next_shot_time = next_shot_time + datetime.timedelta(seconds=6)
+                else:
+                    next_shot_time = next_shot_time + datetime.timedelta(seconds=10)
 
     def on_mouse_release_label_img(self, ev):
         """メインウィンドウの押下処理
