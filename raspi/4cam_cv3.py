@@ -102,12 +102,14 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (
+            auto_exposure, exposure_time_absolute, auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
-            white_balance_auto_preset,red_balance,blue_balance)
+            white_balance_auto_preset, red_balance, blue_balance)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (
+            iso_sensitivity_auto, iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         rev, frame = cap.read()
         time.sleep(1)
@@ -127,12 +129,14 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (
+            auto_exposure, exposure_time_absolute, auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
-            white_balance_auto_preset,red_balance,blue_balance)
+            white_balance_auto_preset, red_balance, blue_balance)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (
+            iso_sensitivity_auto, iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         rev, frame = cap.read()
         time.sleep(1)
@@ -152,12 +156,14 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (
+            auto_exposure, exposure_time_absolute, auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
-            white_balance_auto_preset,red_balance,blue_balance)
+            white_balance_auto_preset, red_balance, blue_balance)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (
+            iso_sensitivity_auto, iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         rev, frame = cap.read()
 
@@ -179,12 +185,14 @@ class PhotoGrabThread(QtCore.QThread):
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c rotate=%d" % (rotate)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (auto_exposure,exposure_time_absolute,auto_exposure_bias)
+        command = "v4l2-ctl -d 0 -c auto_exposure=%d,exposure_time_absolute=%d,auto_exposure_bias=%d" % (
+            auto_exposure, exposure_time_absolute, auto_exposure_bias)
         _ = subprocess.call(command, shell=True)
         command = "v4l2-ctl -d 0 -c white_balance_auto_preset=%d,red_balance=%d,blue_balance=%d" % (
-            white_balance_auto_preset,red_balance,blue_balance)
+            white_balance_auto_preset, red_balance, blue_balance)
         _ = subprocess.call(command, shell=True)
-        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (iso_sensitivity_auto,iso_sensitivity)
+        command = "v4l2-ctl -d 0 -c iso_sensitivity_auto=%d,iso_sensitivity=%d" % (
+            iso_sensitivity_auto, iso_sensitivity)
         _ = subprocess.call(command, shell=True)
         time.sleep(1)
 
@@ -230,6 +238,7 @@ class ListenWebsocket(QtCore.QThread):
     メッセージ受信時に写真を保存
     画像の名前は[タイムスタンプ_カメラID.png]。
     """
+
     def __init__(self, parent=None):
         global IP, PORT
 
@@ -267,9 +276,8 @@ class ListenWebsocket(QtCore.QThread):
             take_photo_flag = False
         # messageがstatusのとき現在の情報を提示
         elif message == "status":
-            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH
-            + ",nextshot: " + next_shot_time.strftime("%Y-%m-%d_%H:%M:%S")
-            + ",prevangle: " + str(shot_counter) + ",label: " + label
+            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH + ",nextshot: " + next_shot_time.strftime(
+                "%Y-%m-%d_%H:%M:%S") + ",prevangle: " + str(shot_counter) + ",label: " + label
             ws.send(status)
         # messageがその他のときラベル更新
         else:
@@ -333,12 +341,14 @@ class CamGui(QtWidgets.QMainWindow):
                         "_angle" + str(shot_counter) +
                         "_" + label + ".png")
                 # shot_counterを更新
-                shot_counter = (shot_counter+1) % SHOTS
+                shot_counter = (shot_counter + 1) % SHOTS
                 # 時間を更新
                 if shot_counter != 0:
-                    next_shot_time = next_shot_time + datetime.timedelta(seconds=INTERVAL_TIME)
+                    next_shot_time = next_shot_time + \
+                        datetime.timedelta(seconds=INTERVAL_TIME)
                 else:
-                    next_shot_time = next_shot_time + datetime.timedelta(seconds=REST_TIME)
+                    next_shot_time = next_shot_time + \
+                        datetime.timedelta(seconds=REST_TIME)
 
     def on_mouse_release_label_img(self, ev):
         """メインウィンドウの押下処理
