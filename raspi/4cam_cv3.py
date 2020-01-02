@@ -262,15 +262,16 @@ class ListenWebsocket(QtCore.QThread):
 
         # messageがstartのとき撮影開始
         if message == "start":
-            take_photo_flag = True
             # ディレクトリをつくる
             now = datetime.datetime.now()
             os.makedirs(
                 storage + "/" +
                 now.strftime("%Y-%m-%d_%H:%M:%S")
             )
+            shot_counter = 0
             PATH = storage + "/" + now.strftime("%Y-%m-%d_%H:%M:%S") + "/"
             next_shot_time = now
+            take_photo_flag = True
         # messageがstopのとき撮影停止
         elif message == "stop":
             take_photo_flag = False
