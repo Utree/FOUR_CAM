@@ -21,8 +21,8 @@ camera resolution
 https://www.arducam.com/product/b003301-arducam-5mp-ov5647-1080p-noir-camera-for-raspberry-pi-infrared-camera-module-sensitive-to-ir-light/
 https://stackoverflow.com/questions/19448078/python-opencv-access-webcam-maximum-resolution/20120262
 '''
-width = 768
-height = 1024
+width = 1024
+height = 1280
 fps = 30
 brightness = 50               # min=0   max=100  step=1
 contrast = 0                  # min=-100  max=100  step=1
@@ -63,10 +63,8 @@ PORT = "8080"
 next_shot_time = datetime.datetime.now()
 # 撮影中フラグ
 take_photo_flag = False
-# 画面に表示中の画像
-ui_label_img_list = []
+# 画像
 IMGS = [None, None, None, None]
-display_flag = True
 #######################################
 
 gp.setwarnings(False)
@@ -85,8 +83,6 @@ class PhotoGrabThread(QtCore.QThread):
         self.index_top = p.img_no
 
     def run(self):
-        global display_flag
-
         i2c = "i2cset -y 1 0x70 0x00 0x04"
         os.system(i2c)
         gp.output(7, False)
@@ -227,10 +223,8 @@ class PhotoGrabThread(QtCore.QThread):
 
             IMGS[index] = f_rgb
 
-            qimg = None
-            if display_flag:
-                qimg = QtGui.QImage(
-                    f_rgb.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+            qimg = QtGui.QImage(
+                f_rgb.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
 
             self.grabbed_signal.emit(index, qimg)
 
@@ -239,7 +233,7 @@ class PhotoGrabThread(QtCore.QThread):
 
 
 class ListenWebsocket(QtCore.QThread):
-    """Webソケットのクライアントスレッド
+    """Webソケットのクライアントスレッド.
 
     Websocketのクライアントとして挙動
     メッセージ受信時に写真を保存
@@ -301,16 +295,15 @@ class ListenWebsocket(QtCore.QThread):
 class CamGui(QtWidgets.QMainWindow):
 
     def __init__(self, *args):
-        global ui_label_img_list
-
         super(CamGui, self).__init__(*args)
         self.ui = gui_ui.Ui_MainWindow()
         self.ui.setupUi(self)
-        ui_label_img_list = [
+
+        self.ui_label_img_list = [
             self.ui.label_img0, self.ui.label_img1,
             self.ui.label_img2, self.ui.label_img3
         ]
-        self.img_no = len(ui_label_img_list)
+        self.img_no = len(self.ui_label_img_list)
 
         # マウスクリックのイベント
         self.ui.label_img0.mouseReleaseEvent = self.on_mouse_release_label_img
@@ -325,17 +318,16 @@ class CamGui(QtWidgets.QMainWindow):
         self.grab_thread.start()
 
     def update_photo(self, index, qimg):
-        """定周期で撮影する用の関数
+        """定周期で撮影する用の関数.
 
         グローバル変数のINTERVAL_TIME(秒)間隔で表示されている画像をpngファイルとして
         保存する関数。
         撮影開始のトリガはメインウィンドウ左上の画像押下。
         画像の名前は[タイムスタンプ_カメラID_angelID_label.png]。
         """
-        global ui_label_img_list, INTERVAL_TIME, REST_TIME, shot_counter, SHOTS, label, PATH, next_shot_time
+        global INTERVAL_TIME, REST_TIME, shot_counter, SHOTS, label, PATH, next_shot_time, IMGS
 
-        if display_flag:
-            ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
+        self.ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
 
         # 現在時刻を取得
         now = datetime.datetime.now()
@@ -361,16 +353,19 @@ class CamGui(QtWidgets.QMainWindow):
                 self.ws_thread.WS.send("OK")
 
     def on_mouse_release_label_img(self, ev):
-        """メインウィンドウの押下処理
+        """メインウィンドウの押下処理.
 
-        メインウィンドウ左上の画像押下時にグローバル変数take_photo_flagを立てる
+        メインウィンドウ左上の画像押下時に撮影する
         """
-        global display_flag
+        global shot_counter, label, PATH, next_shot_time, IMGS
 
-        if display_flag:
-            display_flag = False
-        else:
-            display_flag = True
+        # 現在時刻を取得
+        now = datetime.datetime.now()
+        for index, value in enumerate(IMGS):
+            cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S")
+                        + "_cam" + str(index)
+                        + "_angle" + str(shot_counter)
+                        + "_" + label + ".png", value)
 
 
 if __name__ == '__main__':
