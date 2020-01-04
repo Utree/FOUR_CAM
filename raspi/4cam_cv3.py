@@ -66,6 +66,7 @@ take_photo_flag = False
 # 画面に表示中の画像
 ui_label_img_list = []
 IMGS = [None, None, None, None]
+display_flag = True
 #######################################
 
 gp.setwarnings(False)
@@ -84,6 +85,7 @@ class PhotoGrabThread(QtCore.QThread):
         self.index_top = p.img_no
 
     def run(self):
+        global display_flag
 
         i2c = "i2cset -y 1 0x70 0x00 0x04"
         os.system(i2c)
@@ -225,8 +227,10 @@ class PhotoGrabThread(QtCore.QThread):
 
             IMGS[index] = f_rgb
 
-            qimg = QtGui.QImage(
-                f_rgb.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+            qimg = None
+            if display_flag:
+                qimg = QtGui.QImage(
+                    f_rgb.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
 
             self.grabbed_signal.emit(index, qimg)
 
@@ -330,7 +334,8 @@ class CamGui(QtWidgets.QMainWindow):
         """
         global ui_label_img_list, INTERVAL_TIME, REST_TIME, shot_counter, SHOTS, label, PATH, next_shot_time
 
-        ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
+        if display_flag:
+            ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
 
         # 現在時刻を取得
         now = datetime.datetime.now()
@@ -339,13 +344,10 @@ class CamGui(QtWidgets.QMainWindow):
             if next_shot_time <= now:
                 # 画像を保存
                 for index, value in enumerate(IMGS):
-                    cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S") + "_cam" + str(index) + "_angle" + str(shot_counter) + "_" + label + ".png", value)
-                # for i in range(len(ui_label_img_list)):
-                #     ui_label_img_list[i].pixmap().save(
-                #         PATH + now.strftime("%Y-%m-%d_%H:%M:%S") +
-                #         "_cam" + str(i) +
-                #         "_angle" + str(shot_counter) +
-                #         "_" + label + ".png")
+                    cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S")
+                                + "_cam" + str(index)
+                                + "_angle" + str(shot_counter)
+                                + "_" + label + ".png", value)
                 # shot_counterを更新
                 shot_counter = (shot_counter + 1) % SHOTS
                 # 時間を更新
@@ -363,12 +365,12 @@ class CamGui(QtWidgets.QMainWindow):
 
         メインウィンドウ左上の画像押下時にグローバル変数take_photo_flagを立てる
         """
-        global take_photo_flag
+        global display_flag
 
-        if take_photo_flag:
-            take_photo_flag = False
+        if display_flag:
+            display_flag = False
         else:
-            take_photo_flag = True
+            display_flag = True
 
 
 if __name__ == '__main__':
