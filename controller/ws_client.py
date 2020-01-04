@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit, QLabel
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLineEdit
 from PyQt5 import QtCore
 import websocket
 
@@ -14,13 +14,6 @@ class MyWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle(self.title)
-
-        self.lbl1 = QLabel('音が鳴る時、すべての撮影が停止しています', self)
-        self.lbl1.move(10, 0)
-        self.lbl1.resize(350, 20)
-        self.lbl2 = QLabel('全ラズパイのアプリケーションを再起動して下さい', self)
-        self.lbl2.move(10, 20)
-        self.lbl2.resize(350, 20)
 
         self.btn1 = QPushButton("撮影開始", self)
         self.btn1.setStyleSheet("background-color: #2190ff")

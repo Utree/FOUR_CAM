@@ -2,7 +2,8 @@
 
 ```
 # 必要ソフトをインストール
-$ pip install pyqt5
+$ brew install portaudio
+$ pip install pyqt5 pyaudio pydub
 $ pip install websocket-client==0.47.0
 $ pip install pip install git+https://github.com/Pithikos/python-websocket-server
 

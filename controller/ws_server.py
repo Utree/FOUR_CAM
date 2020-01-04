@@ -1,7 +1,17 @@
 from websocket_server import WebsocketServer
+from pydub import AudioSegment
+from pydub.playback import play
 
+change_audio = AudioSegment.from_mp3('./change.mp3')
+restart_audio = AudioSegment.from_mp3('./restart.mp3')
+rotate_audio = AudioSegment.from_mp3('./rotate.mp3')
 
 CLIENTS = []
+shooting = False
+RASPI_NUM = 4
+SHOT_NUM = 12
+ok_counter = 0
+shot_counter = 0
 
 
 def new_client(client, server):
@@ -12,6 +22,7 @@ def new_client(client, server):
 
 
 def client_left(client, server):
+    global restart_audio
     print('Client {}:{} has left.'.format(
         client['address'][0], client['address'][1]))
 
@@ -19,11 +30,13 @@ def client_left(client, server):
     # 接続台数が少ない場合音を鳴らす
     for c in CLIENTS:
         server.send_message(c, "stop")
-    while len(CLIENTS) < 5:
-        print("\007", end="")
+    if len(CLIENTS) < 5:
+        play(restart_audio)
 
 
 def message_received(client, server, message):
+    global RASPI_NUM, SHOT_NUM, ok_counter, shot_counter, shooting
+
     print('Message "{}" has been received from {}:{}'.format(
         message, client['address'][0], client['address'][1]))
     reply_message = message
@@ -35,8 +48,24 @@ def message_received(client, server, message):
                 server.send_message(c, reply_message)
                 print('Message "{}" has been sent to {}:{}'.format(
                     reply_message, c['address'][0], c['address'][1]))
+    elif message == "OK":
+        print("ok_counter: " + str(ok_counter) + ", shot_counter: " + str(shot_counter))
+        ok_counter = (ok_counter + 1) % RASPI_NUM
+
+        if ok_counter == 0:
+            shot_counter = (shot_counter + 1) % SHOT_NUM
+            if shot_counter == 0:
+                play(change_audio)
+            else:
+                play(rotate_audio)
     # controllerからの応答をraspiに返す
     else:
+        if message == "start":
+            shooting = True
+        elif message == "stop":
+            ok_counter = 0
+            shot_counter = 0
+            shooting = False
         for c in CLIENTS:
             if c != client:
                 server.send_message(c, reply_message)
