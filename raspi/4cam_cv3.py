@@ -21,8 +21,8 @@ camera resolution
 https://www.arducam.com/product/b003301-arducam-5mp-ov5647-1080p-noir-camera-for-raspberry-pi-infrared-camera-module-sensitive-to-ir-light/
 https://stackoverflow.com/questions/19448078/python-opencv-access-webcam-maximum-resolution/20120262
 '''
-width = 1024
-height = 1280
+width = 768
+height = 1024
 fps = 30
 brightness = 50               # min=0   max=100  step=1
 contrast = 0                  # min=-100  max=100  step=1
