@@ -65,6 +65,7 @@ next_shot_time = datetime.datetime.now()
 take_photo_flag = False
 # 画面に表示中の画像
 ui_label_img_list = []
+IMGS = [None, None, None, None]
 #######################################
 
 gp.setwarnings(False)
@@ -222,6 +223,8 @@ class PhotoGrabThread(QtCore.QThread):
             bytes_per_line = 3 * w
             f_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+            IMGS[index] = f_rgb
+
             qimg = QtGui.QImage(
                 f_rgb.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
 
@@ -335,12 +338,14 @@ class CamGui(QtWidgets.QMainWindow):
             # 予定された撮影時間より過ぎていたとき
             if next_shot_time <= now:
                 # 画像を保存
-                for i in range(len(ui_label_img_list)):
-                    ui_label_img_list[i].pixmap().save(
-                        PATH + now.strftime("%Y-%m-%d_%H:%M:%S") +
-                        "_cam" + str(i) +
-                        "_angle" + str(shot_counter) +
-                        "_" + label + ".png")
+                for index, value in enumerate(IMGS):
+                    cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S") + "_cam" + str(index) + "_angle" + str(shot_counter) + "_" + label + ".png", value)
+                # for i in range(len(ui_label_img_list)):
+                #     ui_label_img_list[i].pixmap().save(
+                #         PATH + now.strftime("%Y-%m-%d_%H:%M:%S") +
+                #         "_cam" + str(i) +
+                #         "_angle" + str(shot_counter) +
+                #         "_" + label + ".png")
                 # shot_counterを更新
                 shot_counter = (shot_counter + 1) % SHOTS
                 # 時間を更新
