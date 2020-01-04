@@ -21,8 +21,8 @@ camera resolution
 https://www.arducam.com/product/b003301-arducam-5mp-ov5647-1080p-noir-camera-for-raspberry-pi-infrared-camera-module-sensitive-to-ir-light/
 https://stackoverflow.com/questions/19448078/python-opencv-access-webcam-maximum-resolution/20120262
 '''
-width = 480  # 320
-height = 640  # 240
+width = 1024
+height = 1280
 fps = 30
 brightness = 50               # min=0   max=100  step=1
 contrast = 0                  # min=-100  max=100  step=1
@@ -40,7 +40,7 @@ iso_sensitivity = 1           # iso 100
 撮影方法のパラメータ
 '''
 # インターバル (n秒)
-INTERVAL_TIME = 6
+INTERVAL_TIME = 10
 # 休憩時間 (n秒)
 REST_TIME = 10
 # 撮影回数 (n回)
@@ -255,7 +255,7 @@ class ListenWebsocket(QtCore.QThread):
         self.WS.run_forever()
 
     def on_message(self, ws, message):
-        global take_photo_flag, label, PATH, storage, next_shot_time
+        global take_photo_flag, label, PATH, storage, next_shot_time, shot_counter
 
         print("### message received ###")
         print(message)
@@ -350,6 +350,8 @@ class CamGui(QtWidgets.QMainWindow):
                 else:
                     next_shot_time = next_shot_time + \
                         datetime.timedelta(seconds=REST_TIME)
+                # 撮影終了をcontorllerに知らせる
+                self.ws_thread.WS.send("OK")
 
     def on_mouse_release_label_img(self, ev):
         """メインウィンドウの押下処理
