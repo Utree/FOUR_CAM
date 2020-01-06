@@ -267,10 +267,10 @@ class ListenWebsocket(QtCore.QThread):
             now = datetime.datetime.now()
             os.makedirs(
                 storage + "/" +
-                now.strftime("%Y-%m-%d_%H:%M:%S")
+                now.strftime("%Y-%m-%d_%H-%M-%S")
             )
             shot_counter = 0
-            PATH = storage + "/" + now.strftime("%Y-%m-%d_%H:%M:%S") + "/"
+            PATH = storage + "/" + now.strftime("%Y-%m-%d_%H-%M-%S") + "/"
             next_shot_time = now
             take_photo_flag = True
         # messageがstopのとき撮影停止
@@ -279,7 +279,7 @@ class ListenWebsocket(QtCore.QThread):
         # messageがstatusのとき現在の情報を提示
         elif message == "status":
             status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH + ",nextshot: " + next_shot_time.strftime(
-                "%Y-%m-%d_%H:%M:%S") + ",prevangle: " + str(shot_counter) + ",label: " + label
+                "%Y-%m-%d_%H-%M-%S") + ",prevangle: " + str(shot_counter) + ",label: " + label
             ws.send(status)
         # messageがその他のときラベル更新
         else:
@@ -336,7 +336,7 @@ class CamGui(QtWidgets.QMainWindow):
             if next_shot_time <= now:
                 # 画像を保存
                 for index, value in enumerate(IMGS):
-                    cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S")
+                    cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H-%M-%S")
                                 + "_cam" + str(index)
                                 + "_angle" + str(shot_counter)
                                 + "_" + label + ".png",
@@ -363,7 +363,7 @@ class CamGui(QtWidgets.QMainWindow):
         # 現在時刻を取得
         now = datetime.datetime.now()
         for index, value in enumerate(IMGS):
-            cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S")
+            cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H-%M-%S")
                         + "_cam" + str(index)
                         + "_angle" + str(shot_counter)
                         + "_" + label + ".png",
