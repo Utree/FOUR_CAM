@@ -339,7 +339,8 @@ class CamGui(QtWidgets.QMainWindow):
                     cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S")
                                 + "_cam" + str(index)
                                 + "_angle" + str(shot_counter)
-                                + "_" + label + ".png", value)
+                                + "_" + label + ".png",
+                                cv2.cvtColor(value, cv2.COLOR_BGR2RGB))
                 # shot_counterを更新
                 shot_counter = (shot_counter + 1) % SHOTS
                 # 時間を更新
@@ -365,7 +366,8 @@ class CamGui(QtWidgets.QMainWindow):
             cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H:%M:%S")
                         + "_cam" + str(index)
                         + "_angle" + str(shot_counter)
-                        + "_" + label + ".png", value)
+                        + "_" + label + ".png",
+                        cv2.cvtColor(value, cv2.COLOR_BGR2RGB))
 
 
 if __name__ == '__main__':
