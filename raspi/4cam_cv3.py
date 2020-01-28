@@ -272,7 +272,7 @@ class ListenWebsocket(QtCore.QThread):
                 now.strftime("%Y-%m-%d_%H-%M-%S")
             )
             shot_counter = 0
-            PATH = storage + "/" + now.strftime("%Y-%m-%d_%H-%M-%S") + "/"
+            PATH = storage + now.strftime("%Y-%m-%d_%H-%M-%S") + "/"
             dir_name = now.strftime("%Y-%m-%d_%H-%M-%S")
             next_shot_time = now
             take_photo_flag = True
