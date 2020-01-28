@@ -11,6 +11,7 @@ import cv2
 import subprocess
 import datetime
 import websocket
+from evacuate import evacuate
 
 ######################################
 '''
@@ -51,6 +52,7 @@ label = "undefined"
 # 保存場所
 storage = "/home/pi/Desktop/4cam_img/"
 PATH = storage
+dir_name = ""
 # 指示機のIPアドレス
 IP = "192.168.1.110"
 # 指示機のポート番号
@@ -256,7 +258,7 @@ class ListenWebsocket(QtCore.QThread):
         self.WS.run_forever()
 
     def on_message(self, ws, message):
-        global take_photo_flag, label, PATH, storage, next_shot_time, shot_counter
+        global take_photo_flag, label, PATH, storage, next_shot_time, shot_counter, dir_name
 
         print("### message received ###")
         print(message)
@@ -271,11 +273,15 @@ class ListenWebsocket(QtCore.QThread):
             )
             shot_counter = 0
             PATH = storage + "/" + now.strftime("%Y-%m-%d_%H-%M-%S") + "/"
+            dir_name = now.strftime("%Y-%m-%d_%H-%M-%S")
             next_shot_time = now
             take_photo_flag = True
         # messageがstopのとき撮影停止
         elif message == "stop":
             take_photo_flag = False
+            # データ退避
+            if not dir_name == "":
+                evacuate(dir_name)
         # messageがstatusのとき現在の情報を提示
         elif message == "status":
             status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH + ",nextshot: " + next_shot_time.strftime(

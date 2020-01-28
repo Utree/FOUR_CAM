@@ -36,6 +36,8 @@ $ rm -rf ./opencv_contrib
 
 # websocket-clientをインストール
 $ python3 -m pip install websocket-client==0.47.0
+# データ退避用のライブラリ
+python -m pip install paramiko scp python-dotenv
 
 # ソースコードをダウンロード
 $ cd ~/Desktop
@@ -44,5 +46,8 @@ $ git clone https://github.com/Utree/RaspberryPi.git
 # カメラを利用
 $ cd Desktop/RaspberryPi/Multi_Camera_Adapter/Multi_Adapter_Board_4Channel/Multi_Camera_Adapter_V2.1
 $ chmod +x ./init_camera.sh
+# 環境変数を用意
+$ cp ./.env.sample ./.env
+# 撮影用プログラムを実行
 $ python3 4cam_cv3.py
 ```
