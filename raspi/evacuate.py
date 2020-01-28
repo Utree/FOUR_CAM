@@ -18,7 +18,7 @@ def evacuate(target):
     password = environ.get("PASSWORD")
     raspi_name = environ.get("RASPI_NAME")
 
-    root_dir = "/Users/sekiya/Desktop/4cam_img"
+    root_dir = "/home/pi/Desktop/4cam_img"
     remote_path = "/Volumes/Extreme SSD/scp"
     remote_path = join(remote_path, raspi_name)
 
