@@ -1,10 +1,13 @@
+from os.path import join, dirname
 from websocket_server import WebsocketServer
 from pydub import AudioSegment
 from pydub.playback import play
+from os.path import exists
 
-change_audio = AudioSegment.from_mp3('./change.mp3')
-restart_audio = AudioSegment.from_mp3('./restart.mp3')
-rotate_audio = AudioSegment.from_mp3('./rotate.mp3')
+connect_drive_audio = AudioSegment.from_mp3(join(dirname(__file__), 'connect_drive.mp3'))
+change_audio = AudioSegment.from_mp3(join(dirname(__file__), 'change.mp3'))
+restart_audio = AudioSegment.from_mp3(join(dirname(__file__), 'restart.mp3'))
+rotate_audio = AudioSegment.from_mp3(join(dirname(__file__), 'rotate.mp3'))
 
 CLIENTS = []
 shooting = False
@@ -12,6 +15,7 @@ RASPI_NUM = 4
 SHOT_NUM = 12
 ok_counter = 0
 shot_counter = 0
+drive_path = "/Volumes/Extreme SSD/scp/"
 
 
 def new_client(client, server):
@@ -75,6 +79,9 @@ def message_received(client, server, message):
 
 # Main
 if __name__ == "__main__":
+    # 外部ディスクの接続確認
+    if not exists(drive_path):
+        play(connect_drive_audio)
     server = WebsocketServer(port=8080, host='0.0.0.0')
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)

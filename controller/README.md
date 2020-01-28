@@ -2,7 +2,7 @@
 
 ```
 # 必要ソフトをインストール
-$ brew install portaudio
+$ brew install portaudio ffmpeg
 $ pip install pyqt5 pyaudio pydub
 $ pip install websocket-client==0.47.0
 $ pip install pip install git+https://github.com/Pithikos/python-websocket-server
