@@ -40,9 +40,9 @@ iso_sensitivity = 1           # iso 100
 '''
 撮影方法のパラメータ
 '''
-# インターバル (n秒)
+# 撮影間隔 (n秒)
 INTERVAL_TIME = 10
-# 休憩時間 (n秒)
+# 入れ替え時間 (n秒)
 REST_TIME = 10
 # 撮影回数 (n回)
 SHOTS = 12
