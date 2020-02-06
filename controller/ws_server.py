@@ -3,6 +3,8 @@ from websocket_server import WebsocketServer
 from pydub import AudioSegment
 from pydub.playback import play
 from os.path import exists
+from switch import main as rotate
+from time import sleep
 
 connect_drive_audio = AudioSegment.from_mp3(join(dirname(__file__), 'connect_drive.mp3'))
 change_audio = AudioSegment.from_mp3(join(dirname(__file__), 'change.mp3'))
@@ -62,6 +64,10 @@ def message_received(client, server, message):
                 play(change_audio)
             else:
                 play(rotate_audio)
+                # 回転させる
+                rotate("On")
+                sleep(6)
+                rotate("Off")
     # controllerからの応答をraspiに返す
     else:
         if message == "start":
