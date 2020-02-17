@@ -41,7 +41,7 @@ iso_sensitivity = 1           # iso 100
 撮影方法のパラメータ
 '''
 # 撮影回数 (n回)
-SHOTS = 12
+SHOTS = 8
 shot_counter = 0
 # ラベル
 label = "undefined"

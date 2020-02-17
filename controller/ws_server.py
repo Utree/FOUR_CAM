@@ -71,9 +71,9 @@ def message_received(client, server, message):
                 # 回転させる
                 play(rotate_audio)
                 rotate("On")
-                sleep(SCHEDULE[shot_counter])
+                sleep(SCHEDULE[shot_counter-1])
                 rotate("Off")
-                sleep(WAIT_TIME)
+            sleep(WAIT_TIME)
 
             # 次の撮影命令を出す
             if shooting:
@@ -89,6 +89,7 @@ def message_received(client, server, message):
             ok_counter = 0
             shot_counter = 0
             shooting = False
+            rotate("Off")
         for c in CLIENTS:
             if c != client:
                 server.send_message(c, reply_message)
