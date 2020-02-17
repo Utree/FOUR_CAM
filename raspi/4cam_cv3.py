@@ -40,10 +40,6 @@ iso_sensitivity = 1           # iso 100
 '''
 撮影方法のパラメータ
 '''
-# 撮影間隔 (n秒)
-INTERVAL_TIME = 10
-# 入れ替え時間 (n秒)
-REST_TIME = 10
 # 撮影回数 (n回)
 SHOTS = 12
 shot_counter = 0
@@ -61,8 +57,6 @@ PORT = "8080"
 '''
 その他の変数
 '''
-# 次の撮影時間
-next_shot_time = datetime.datetime.now()
 # 撮影中フラグ
 take_photo_flag = False
 # 画像
@@ -258,7 +252,7 @@ class ListenWebsocket(QtCore.QThread):
         self.WS.run_forever()
 
     def on_message(self, ws, message):
-        global take_photo_flag, label, PATH, storage, next_shot_time, shot_counter, dir_name
+        global take_photo_flag, label, PATH, storage, shot_counter, dir_name
 
         print("### message received ###")
         print(message)
@@ -274,7 +268,8 @@ class ListenWebsocket(QtCore.QThread):
             shot_counter = 0
             PATH = storage + now.strftime("%Y-%m-%d_%H-%M-%S") + "/"
             dir_name = now.strftime("%Y-%m-%d_%H-%M-%S")
-            next_shot_time = now
+            take_photo_flag = True
+        elif message == "shot":
             take_photo_flag = True
         # messageがstopのとき撮影停止
         elif message == "stop":
@@ -284,8 +279,8 @@ class ListenWebsocket(QtCore.QThread):
                 evacuate(dir_name)
         # messageがstatusのとき現在の情報を提示
         elif message == "status":
-            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH + ",nextshot: " + next_shot_time.strftime(
-                "%Y-%m-%d_%H-%M-%S") + ",prevangle: " + str(shot_counter) + ",label: " + label
+            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH
+            + ",prevangle: " + str(shot_counter) + ",label: " + label
             ws.send(status)
         # messageがその他のときラベル更新
         else:
@@ -331,40 +326,32 @@ class CamGui(QtWidgets.QMainWindow):
         撮影開始のトリガはメインウィンドウ左上の画像押下。
         画像の名前は[タイムスタンプ_カメラID_angelID_label.png]。
         """
-        global INTERVAL_TIME, REST_TIME, shot_counter, SHOTS, label, PATH, next_shot_time, IMGS
+        global shot_counter, SHOTS, label, PATH, take_photo_flag, IMGS
 
         self.ui_label_img_list[index].setPixmap(QtGui.QPixmap.fromImage(qimg))
 
         # 現在時刻を取得
         now = datetime.datetime.now()
         if take_photo_flag:
-            # 予定された撮影時間より過ぎていたとき
-            if next_shot_time <= now:
-                # 画像を保存
-                for index, value in enumerate(IMGS):
-                    cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H-%M-%S")
-                                + "_cam" + str(index)
-                                + "_angle" + str(shot_counter)
-                                + "_" + label + ".png",
-                                cv2.cvtColor(value, cv2.COLOR_BGR2RGB))
-                # shot_counterを更新
-                shot_counter = (shot_counter + 1) % SHOTS
-                # 時間を更新
-                if shot_counter != 0:
-                    next_shot_time = next_shot_time + \
-                        datetime.timedelta(seconds=INTERVAL_TIME)
-                else:
-                    next_shot_time = next_shot_time + \
-                        datetime.timedelta(seconds=REST_TIME)
-                # 撮影終了をcontorllerに知らせる
-                self.ws_thread.WS.send("OK")
+            # 画像を保存
+            for index, value in enumerate(IMGS):
+                cv2.imwrite(PATH + now.strftime("%Y-%m-%d_%H-%M-%S")
+                            + "_cam" + str(index)
+                            + "_angle" + str(shot_counter)
+                            + "_" + label + ".png",
+                            cv2.cvtColor(value, cv2.COLOR_BGR2RGB))
+            # shot_counterを更新
+            shot_counter = (shot_counter + 1) % SHOTS
+            take_photo_flag = False
+            # 撮影終了をcontorllerに知らせる
+            self.ws_thread.WS.send("OK")
 
     def on_mouse_release_label_img(self, ev):
         """メインウィンドウの押下処理.
 
         メインウィンドウ左上の画像押下時に撮影する
         """
-        global shot_counter, label, PATH, next_shot_time, IMGS
+        global shot_counter, label, PATH, IMGS
 
         # 現在時刻を取得
         now = datetime.datetime.now()

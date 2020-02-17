@@ -14,7 +14,10 @@ rotate_audio = AudioSegment.from_mp3(join(dirname(__file__), 'rotate.mp3'))
 CLIENTS = []
 shooting = False
 RASPI_NUM = 4
-SHOT_NUM = 12
+SHOT_NUM = 8
+SCHEDULE = [36, 18, 36, 9, 36, 18, 36]
+CHANGE_TIME = 6
+WAIT_TIME = 3
 ok_counter = 0
 shot_counter = 0
 drive_path = "/Volumes/Extreme SSD/scp/"
@@ -41,7 +44,7 @@ def client_left(client, server):
 
 
 def message_received(client, server, message):
-    global RASPI_NUM, SHOT_NUM, ok_counter, shot_counter, shooting
+    global RASPI_NUM, SHOT_NUM, ok_counter, shot_counter, shooting, SCHEDULE, CHANGE_TIME, WAIT_TIME
 
     print('Message "{}" has been received from {}:{}'.format(
         message, client['address'][0], client['address'][1]))
@@ -61,15 +64,25 @@ def message_received(client, server, message):
         if ok_counter == 0:
             shot_counter = (shot_counter + 1) % SHOT_NUM
             if shot_counter == 0:
+                # 入れ替える
                 play(change_audio)
+                sleep(CHANGE_TIME)
             else:
-                play(rotate_audio)
                 # 回転させる
+                play(rotate_audio)
                 rotate("On")
-                sleep(6)
+                sleep(SCHEDULE[shot_counter])
                 rotate("Off")
+                sleep(WAIT_TIME)
+
+            # 次の撮影命令を出す
+            if shooting:
+                for c in CLIENTS:
+                    if c['address'][0] != "127.0.0.1":
+                        server.send_message(c, "shot")
     # controllerからの応答をraspiに返す
     else:
+        """ START MESSAGE"""
         if message == "start":
             shooting = True
         elif message == "stop":
