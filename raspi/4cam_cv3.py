@@ -279,8 +279,8 @@ class ListenWebsocket(QtCore.QThread):
                 evacuate(dir_name)
         # messageがstatusのとき現在の情報を提示
         elif message == "status":
-            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH
-            + ",prevangle: " + str(shot_counter) + ",label: " + label
+            status = "flag: " + str(take_photo_flag) + ",Dir: " + PATH +\
+                ",prevangle: " + str(shot_counter) + ",label: " + label
             ws.send(status)
         # messageがその他のときラベル更新
         else:
